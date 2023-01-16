@@ -37,6 +37,7 @@ float api_totalvalue(char *wallets[], int walletcount) {
 
     printf("%llu\n", finalBalance);
 
+    json_object_put(response);
     free(s.ptr);
 
     return 0.0;
