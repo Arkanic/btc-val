@@ -4,12 +4,11 @@
 #include "val.h"
 
 int main(void) {
-    struct string s;
-    CURL *curl = curl_easy_init();
+    api_init();
 
-    webget(curl, &s, "arkanic.github.io");
-    printf("%s\n", s.ptr);
+    char *wallets[] = {"34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo", "bc1qgdjqv0av3q56jvd82tkdjpy7gdp9ut8tlqmgrpmv24sq90ecnvqqjwvw97"};
+    api_totalvalue(wallets, 2);
 
-    free(s.ptr);
-    curl_easy_cleanup(curl);
+    api_shutdown();
+    return 0;
 }

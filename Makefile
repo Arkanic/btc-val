@@ -1,12 +1,16 @@
-C_FLAGS=-O3
-C_LIBS=-lcurl
-C_FILES=val.o net.o
+CC=gcc
+CFLAGS=-O3 -lcurl -ljson-c
+OUT=val.o net.o api.o
 
-val: $(C_FILES)
-	gcc -o $@ $(C_FILES) $(C_FLAGS) $(C_LIBS)
+all: val
 
-*.o: *.c
-	gcc -c -o $@ $< $(C_FLAGS)
+%.o: %.c
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+val: $(OUT)
+	$(CC) -g -o val $(OUT) $(CFLAGS)
+
+.PHONY: clean
 
 clean:
-	$(RM) *.o val
+	rm -f *.o val
