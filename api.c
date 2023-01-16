@@ -16,7 +16,7 @@ void api_shutdown(void) {
     curl_easy_cleanup(curl);
 }
 
-float api_totalvalue(char *wallets[], int walletcount) {
+unsigned long long api_totalvalue(char *wallets[], int walletcount) {
     char *baseurl = "blockchain.info/multiaddr?active=";
     int len = strlen(baseurl);
     len += 63 * walletcount; // extra is for pipe, 62 is for segwit address (longest)
@@ -35,10 +35,22 @@ float api_totalvalue(char *wallets[], int walletcount) {
     struct json_object *responseFinalBalance = json_object_object_get(responseWallet, "final_balance");
     unsigned long long finalBalance = json_object_get_int64(responseFinalBalance);
 
-    printf("%llu\n", finalBalance);
-
     json_object_put(response);
     free(s.ptr);
 
-    return 0.0;
+    return finalBalance;
+}
+
+double api_btcprice(void) {
+    char *url = "blockchain.info/ticker";
+    webget(curl, &s, url);
+
+    struct json_object *response = json_tokener_parse(s.ptr);
+    struct json_object *responseUSD = json_object_object_get(response, "USD");
+    struct json_object *responseUSD15m = json_object_object_get(responseUSD, "15m");
+    double priceUSD = json_object_get_double(responseUSD15m);
+
+    free(s.ptr);
+
+    return priceUSD;
 }
