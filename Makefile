@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-O3 -lcurl -ljson-c
-OUT=val.o net.o api.o
+OUT=val.o net.o api.o time.o
 
 all: val
 

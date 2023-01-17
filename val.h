@@ -27,4 +27,7 @@ struct txn {
 
 struct txn **api_recenttxns(int *resultCount, char *walletstr, int count);
 
+// TIME.C
+char *timeago(unsigned long long time);
+
 #endif

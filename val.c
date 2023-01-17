@@ -89,12 +89,14 @@ int main(int argc, char *argv[]) {
 
     int transactionslength = 0;
     struct txn **transactions = api_recenttxns(&transactionslength, walletstr, 3);
-    printf("Most Recent Transactions:\n");
+    printf("\nMost Recent Transactions:\n");
     for(int i = 0; i < transactionslength; i++) {
         struct txn *transaction = transactions[i];
 
         double diff = transaction->diff / 100000000.0f;
-        printf("%.6fBTC @ %llu\n", diff, transaction->time);
+        char *when = timeago(transaction->time);
+        printf("%.6fBTC %s\n", diff, when);
+        free(when);
     }
 
     free(walletstr);
