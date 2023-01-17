@@ -80,8 +80,8 @@ int main(int argc, char *argv[]) {
     char *walletstr = api_getwalletstr(wallets, walletCount);
     unsigned long long value = api_walletsvalue(walletstr, walletCount);
 
-    struct txn **transactions;
-    int transactionslength = api_recenttxns(transactions, walletstr, 3);
+    int transactionslength = 0;
+    struct txn **transactions = api_recenttxns(&transactionslength, walletstr, 3);
     printf("txl: %d\n", transactionslength);
     for(int i = 0; i < transactionslength; i++) {
         struct txn *transaction = transactions[i];

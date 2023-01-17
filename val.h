@@ -25,6 +25,6 @@ struct txn {
     unsigned long long time;
 };
 
-int api_recenttxns(struct txn **out, char *walletstr, int count);
+struct txn **api_recenttxns(int *resultCount, char *walletstr, int count);
 
 #endif

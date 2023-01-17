@@ -46,14 +46,14 @@ unsigned long long api_walletsvalue(char *walletstr, int walletcount) {
 }
 
 // returns length of out array
-int api_recenttxns(struct txn **out, char *walletstr, int count) {
+struct txn **api_recenttxns(int *resultCount, char *walletstr, int count) {
     struct json_object *wallets = json_tokener_parse(walletstr);
     struct json_object *txs = json_object_object_get(wallets, "txs");
 
     int txslen = json_object_array_length(txs);
     if(txslen < count) count = txslen;
 
-    out = (struct txn **)malloc(sizeof(struct txn *) * count);
+    struct txn **out = (struct txn **)malloc(sizeof(struct txn *) * count);
     for(int i = 0; i < count; i++) {
         struct txn *transaction = (struct txn *)malloc(sizeof(struct txn));
         out[i] = transaction;
@@ -69,7 +69,8 @@ int api_recenttxns(struct txn **out, char *walletstr, int count) {
 
     json_object_put(wallets);
 
-    return count;
+    *resultCount = count;
+    return out;
 }
 
 void api_recenttxns_freeout(struct txn *out[], int length) {
