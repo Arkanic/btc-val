@@ -6,32 +6,38 @@
 #include "val.h"
 
 int main(int argc, char *argv[]) {
-    char *filename = "./wallets.txt";
-    if(argc > 1) filename = argv[1];
+    char *filename;
+    if(argc == 1) {
+        printf("Usage: ./val [address to wallet]\nFile is a newline-separated list of wallet addresses\n");
+        return 1;
+    } else if(argc > 1) filename = argv[1];
 
     FILE *fp = fopen(filename, "r");
-    if(fp == NULL) return 1;
+    if(fp == NULL) {
+        printf("Selected file was not found or could not be opened.\n");
+        return 1;
+    }
 
     char **wallets = (char **)malloc(sizeof(char *));
     char *line = NULL;
     size_t len = 0;
     ssize_t read;
 
-    int i = 0;
+    int walletCount = 0;
     while((read = getline(&line, &len, fp)) != -1) {
 
-        wallets[i] = (char *)malloc(sizeof(char) * (read + 1));
-        strcpy(wallets[i], line);
-        char end = wallets[i][strlen(line) - 1];
-        if(end == '\n') wallets[i][strlen(line) - 1] = '\0';
+        wallets[walletCount] = (char *)malloc(sizeof(char) * (read + 1));
+        strcpy(wallets[walletCount], line);
+        char end = wallets[walletCount][strlen(line) - 1];
+        if(end == '\n') wallets[walletCount][strlen(line) - 1] = '\0';
 
-        i++;
-        wallets = realloc(wallets, sizeof(char *) * (i + 1));
+        walletCount++;
+        wallets = realloc(wallets, sizeof(char *) * (walletCount + 1));
     }
 
     api_init();
 
-    unsigned long long value = api_totalvalue(wallets, i);
+    unsigned long long value = api_totalvalue(wallets, walletCount);
     double price = api_btcprice();
     
     double valueBTC = value / 100000000.0f;
@@ -40,8 +46,8 @@ int main(int argc, char *argv[]) {
 
     api_shutdown();
 
-    for(int j = 0; j < i; j++) {
-        free(wallets[j]);
+    for(int i = 0; i < walletCount; i++) {
+        free(wallets[i]);
     }
     free(wallets);
 
