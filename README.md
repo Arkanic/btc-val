@@ -3,6 +3,8 @@ Get value of list of bitcoin wallets (ie electrum addresses) by their public key
 
 Intended purpose is just to check your wallets every so often without actually exposing/using any private keys on a computer. Uses blockchain.info api to query address values and current price of btc
 
+![image](https://user-images.githubusercontent.com/50847107/212818913-7a907dca-7e2d-400f-9589-c38648c8da93.png)
+
 ## Usage
 
 `./val wallet.txt`
