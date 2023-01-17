@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <locale.h>
 #include <curl/curl.h>
 
 #include "val.h"
@@ -8,14 +9,17 @@
 struct {
     char *ticker;
     char *filename;
+    int recenttx;
+    short showrtx;
+    short showval;
 } Config;
 
-char *defaultTicker = "USD";
-char *defaultFilename = "!!!";
-
 void initconfig(void) {
-    Config.ticker = defaultTicker;
-    Config.filename = defaultFilename;
+    Config.ticker = "USD";
+    Config.filename = "!!!";
+    Config.recenttx = 5;
+    Config.showrtx = 1;
+    Config.showval = 1;
 }
 
 void showhelp(void) {
@@ -23,11 +27,16 @@ void showhelp(void) {
     printf("Flags:\n"
             "--help                Show this help message\n"
             "--ticker [currency]   Set what fiat value the currency should be displayed in\n"
+            "--recenttx [amount]   Number of recent transactions to show. Will be limited to the number actually available.\n"
+            "--nortx               Do not show recent transactions\n"
+            "--noval               Do not show wallet value\n"
     );
 }
 
 int main(int argc, char *argv[]) {
     initconfig();
+
+    setlocale(LC_NUMERIC, "");
 
     if(argc == 1) {
         showhelp();
@@ -41,6 +50,12 @@ int main(int argc, char *argv[]) {
             } else if(!strcmp(argv[j], "--help")) {
                 showhelp();
                 return 0;
+            } else if(!strcmp(argv[j], "--recenttx") && more) {
+                Config.recenttx = atoi(argv[++j]);
+            } else if(!strcmp(argv[j], "--nortx")) {
+                Config.showrtx = 0;
+            } else if(!strcmp(argv[j], "--noval")) {
+                Config.showval = 0;
             } else {
                 Config.filename = argv[j];
             }
@@ -82,29 +97,32 @@ int main(int argc, char *argv[]) {
 
     double price = api_btcprice(Config.ticker);
     
-    double valueBTC = value / 100000000.0f;
-    double valueUSD = valueBTC * price;
-    printf("BTC: %.6f BTC\nValue: $%.2f %s\n", valueBTC, valueUSD, Config.ticker);
+    if(Config.showval) {
+        double valueBTC = value / 100000000.0f;
+        double valueUSD = valueBTC * price;
+        printf("BTC: %.6f BTC\nValue: $%'.2f %s\n%d Wallets\n\n", valueBTC, valueUSD, Config.ticker, walletCount);
+    }
 
+    if(Config.showrtx) {
+        int transactionslength = 0;
+        struct txn **transactions = api_recenttxns(&transactionslength, walletstr, Config.recenttx);
+        printf("Recent Transactions:\n");
+        for(int i = 0; i < transactionslength; i++) {
+            struct txn *transaction = transactions[i];
 
-    int transactionslength = 0;
-    struct txn **transactions = api_recenttxns(&transactionslength, walletstr, 3);
-    printf("\nMost Recent Transactions:\n");
-    for(int i = 0; i < transactionslength; i++) {
-        struct txn *transaction = transactions[i];
+            double diff = transaction->diff / 100000000.0f;
+            char *when = timeago(transaction->time);
 
-        double diff = transaction->diff / 100000000.0f;
-        char *when = timeago(transaction->time);
+            char *color;
+            if(diff < 0) {
+                color = "\x1b[38;5;124m";
+            } else {
+                color = "\x1b[38;5;118m ";
+            }
 
-        char *color;
-        if(diff < 0) {
-            color = "\x1b[38;5;124m";
-        } else {
-            color = "\x1b[38;5;118m ";
+            printf("%s%.6fBTC\x1b[0m %s\n", color, diff, when);
+            free(when);
         }
-
-        printf("%s%.6fBTC\x1b[0m %s\n", color, diff, when);
-        free(when);
     }
 
     free(walletstr);

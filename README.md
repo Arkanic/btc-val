@@ -5,7 +5,7 @@ Intended purpose is just to check your wallets every so often without actually e
 
 ![image](https://user-images.githubusercontent.com/50847107/212818913-7a907dca-7e2d-400f-9589-c38648c8da93.png)
 
-*TODO: add bar-pie-chart thingy to show what addresses constitute the most btc, show most recent transactions/in and outs, add more tokens, and different fiat values.*
+*TODO: add bar-pie-chart thingy to show what addresses constitute the most btc, add more tokens, and different fiat values.*
 
 Please create an issue if you want something in particular.
 
@@ -13,21 +13,21 @@ Please create an issue if you want something in particular.
 
 `./val wallet.txt`
 
-returns
-
-```
-Sats: 100000000
-BTC: 1.00BTC
-Price: $20000
-```
-
-wallet.txt is a file of addresses separated by commas. All address formats work.
+wallet.txt is a file of addresses separated by commas. All address formats work. i.e.:
 
 ```
 34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo
 bc1qgdjqv0av3q56jvd82tkdjpy7gdp9ut8tlqmgrpmv24sq90ecnvqqjwvw97
 3JJmF63ifcamPLiAmLgG96RA599yNtY3EQ
 1LruNZjwamWJXThX2Y8C2d47QqhAkkc5os
+```
+
+```
+--help                Show this help message
+--ticker [currency]   Set what fiat value the currency should be displayed in
+--recenttx [amount]   Number of recent transactions to show. Will be limited to the number actually available.
+--nortx               Do not show recent transactions
+--noval               Do not show wallet value
 ```
 
 ## Building
