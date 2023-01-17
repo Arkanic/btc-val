@@ -80,22 +80,24 @@ int main(int argc, char *argv[]) {
     char *walletstr = api_getwalletstr(wallets, walletCount);
     unsigned long long value = api_walletsvalue(walletstr, walletCount);
 
-    int transactionslength = 0;
-    struct txn **transactions = api_recenttxns(&transactionslength, walletstr, 3);
-    printf("txl: %d\n", transactionslength);
-    for(int i = 0; i < transactionslength; i++) {
-        struct txn *transaction = transactions[i];
-
-        printf("Diff: %lldsat @ %llu", transaction->diff, transaction->time);
-    }
-
-    free(walletstr);
-
     double price = api_btcprice(Config.ticker);
     
     double valueBTC = value / 100000000.0f;
     double valueUSD = valueBTC * price;
     printf("Sats: %llusat\nBTC: %.6fBTC\nValue: $%.2f %s\n", value, valueBTC, valueUSD, Config.ticker);
+
+
+    int transactionslength = 0;
+    struct txn **transactions = api_recenttxns(&transactionslength, walletstr, 3);
+    printf("Most Recent Transactions:\n");
+    for(int i = 0; i < transactionslength; i++) {
+        struct txn *transaction = transactions[i];
+
+        double diff = transaction->diff / 100000000.0f;
+        printf("%.6fBTC @ %llu\n", diff, transaction->time);
+    }
+
+    free(walletstr);
 
     api_shutdown();
 
