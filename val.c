@@ -18,12 +18,19 @@ void initconfig(void) {
     Config.filename = defaultFilename;
 }
 
+void showhelp(void) {
+    printf("Usage: ./val [address to wallet]\nFile is a newline-separated list of wallet addresses\n");
+    printf("Flags:\n"
+            "--help                Show this help message\n"
+            "--ticker [currency]   Set what fiat value the currency should be displayed in\n"
+    );
+}
+
 int main(int argc, char *argv[]) {
     initconfig();
 
     if(argc == 1) {
-        printf("Usage: ./val [address to wallet]\nFile is a newline-separated list of wallet addresses\n");
-        printf("Flags:\n--ticker   Set what fiat value the currency should be displayed in\n");
+        showhelp();
         return 1;
     } else if(argc > 1) {
         for(int j = 1; j < argc; j++) {
@@ -31,6 +38,9 @@ int main(int argc, char *argv[]) {
 
             if(!strcmp(argv[j], "--ticker") && more) {
                 Config.ticker = argv[++j];
+            } else if(!strcmp(argv[j], "--help")) {
+                showhelp();
+                return 0;
             } else {
                 Config.filename = argv[j];
             }
@@ -38,7 +48,8 @@ int main(int argc, char *argv[]) {
     }
 
     if(strcmp(Config.filename, "!!!") == 0) {
-        printf("Please choose a file to load addresses from!\n");
+        printf("No file chosen!\n");
+        showhelp();
         return 1;
     }
     FILE *fp = fopen(Config.filename, "r");
@@ -66,7 +77,20 @@ int main(int argc, char *argv[]) {
 
     api_init();
 
-    unsigned long long value = api_totalvalue(wallets, walletCount);
+    char *walletstr = api_getwalletstr(wallets, walletCount);
+    unsigned long long value = api_walletsvalue(walletstr, walletCount);
+
+    struct txn **transactions;
+    int transactionslength = api_recenttxns(transactions, walletstr, 3);
+    printf("txl: %d\n", transactionslength);
+    for(int i = 0; i < transactionslength; i++) {
+        struct txn *transaction = transactions[i];
+
+        printf("Diff: %lldsat @ %llu", transaction->diff, transaction->time);
+    }
+
+    free(walletstr);
+
     double price = api_btcprice(Config.ticker);
     
     double valueBTC = value / 100000000.0f;

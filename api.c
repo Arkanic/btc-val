@@ -1,4 +1,5 @@
 #include <json-c/json.h>
+#include <json-c/json_object.h>
 #include <string.h>
 #include <curl/curl.h>
 #include <json-c/json.h>
@@ -16,7 +17,7 @@ void api_shutdown(void) {
     curl_easy_cleanup(curl);
 }
 
-unsigned long long api_totalvalue(char *wallets[], int walletcount) {
+char *api_getwalletstr(char *wallets[], int walletcount) {
     char *baseurl = "blockchain.info/multiaddr?active=";
     int len = strlen(baseurl);
     len += 63 * walletcount; // extra is for pipe, 62 is for segwit address (longest)
@@ -30,15 +31,52 @@ unsigned long long api_totalvalue(char *wallets[], int walletcount) {
 
     webget(curl, &s, url);
 
+    return s.ptr; //  needs to be freed
+}
+
+unsigned long long api_walletsvalue(char *walletstr, int walletcount) {
     struct json_object *response = json_tokener_parse(s.ptr);
     struct json_object *responseWallet = json_object_object_get(response, "wallet");
     struct json_object *responseFinalBalance = json_object_object_get(responseWallet, "final_balance");
     unsigned long long finalBalance = json_object_get_int64(responseFinalBalance);
 
     json_object_put(response);
-    free(s.ptr);
 
     return finalBalance;
+}
+
+// returns length of out array
+int api_recenttxns(struct txn **out, char *walletstr, int count) {
+    struct json_object *wallets = json_tokener_parse(walletstr);
+    struct json_object *txs = json_object_object_get(wallets, "txs");
+
+    int txslen = json_object_array_length(txs);
+    if(txslen < count) count = txslen;
+
+    out = (struct txn **)malloc(sizeof(struct txn *) * count);
+    for(int i = 0; i < count; i++) {
+        struct txn *transaction = (struct txn *)malloc(sizeof(struct txn));
+        out[i] = transaction;
+        
+        struct json_object *jsontxn = json_object_array_get_idx(txs, i);
+        
+        long long result = json_object_get_int64(json_object_object_get(jsontxn, "result"));
+        transaction->diff = result;
+
+        unsigned long long time = json_object_get_int64(json_object_object_get(jsontxn, "time"));
+        transaction->time = time;
+    }
+
+    json_object_put(wallets);
+
+    return count;
+}
+
+void api_recenttxns_freeout(struct txn *out[], int length) {
+    for(int i = 0; i < length; i++) {
+        free(out[i]);
+    }
+    free(out);
 }
 
 double api_btcprice(char *ticker) {
