@@ -5,7 +5,7 @@ Intended purpose is just to check your wallets every so often without actually e
 
 ![image](https://user-images.githubusercontent.com/50847107/212818913-7a907dca-7e2d-400f-9589-c38648c8da93.png)
 
-TODO: add bar-pie-chart thingy to show what addresses constitute the most btc, add more tokens, different fiat values, etc.
+*TODO: add bar-pie-chart thingy to show what addresses constitute the most btc, show most recent transactions/in and outs, add more tokens, and different fiat values.*
 
 Please create an issue if you want something in particular.
 
