@@ -17,6 +17,6 @@ void webget(CURL *curl, struct string *s, char *url);
 void api_init(void);
 void api_shutdown(void);
 unsigned long long api_totalvalue(char *wallets[], int walletcount);
-double api_btcprice(void);
+double api_btcprice(char *ticker);
 
 #endif

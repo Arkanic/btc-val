@@ -41,12 +41,12 @@ unsigned long long api_totalvalue(char *wallets[], int walletcount) {
     return finalBalance;
 }
 
-double api_btcprice(void) {
+double api_btcprice(char *ticker) {
     char *url = "blockchain.info/ticker";
     webget(curl, &s, url);
 
     struct json_object *response = json_tokener_parse(s.ptr);
-    struct json_object *responseUSD = json_object_object_get(response, "USD");
+    struct json_object *responseUSD = json_object_object_get(response, ticker);
     struct json_object *responseUSD15m = json_object_object_get(responseUSD, "15m");
     double priceUSD = json_object_get_double(responseUSD15m);
 
