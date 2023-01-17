@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
     
     double valueBTC = value / 100000000.0f;
     double valueUSD = valueBTC * price;
-    printf("Sats: %llusat\nBTC: %fBTC\nPrice: $%f\n", value, valueBTC, valueUSD);
+    printf("Sats: %llusat\nBTC: %.6fBTC\nValue: $%.2f USD\n", value, valueBTC, valueUSD);
 
     api_shutdown();
 
