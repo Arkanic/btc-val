@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
     
     double valueBTC = value / 100000000.0f;
     double valueUSD = valueBTC * price;
-    printf("Sats: %llusat\nBTC: %.6fBTC\nValue: $%.2f %s\n", value, valueBTC, valueUSD, Config.ticker);
+    printf("BTC: %.6f BTC\nValue: $%.2f %s\n", valueBTC, valueUSD, Config.ticker);
 
 
     int transactionslength = 0;
@@ -95,7 +95,15 @@ int main(int argc, char *argv[]) {
 
         double diff = transaction->diff / 100000000.0f;
         char *when = timeago(transaction->time);
-        printf("%.6fBTC %s\n", diff, when);
+
+        char *color;
+        if(diff < 0) {
+            color = "\x1b[38;5;124m";
+        } else {
+            color = "\x1b[38;5;118m ";
+        }
+
+        printf("%s%.6fBTC\x1b[0m %s\n", color, diff, when);
         free(when);
     }
 
