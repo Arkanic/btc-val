@@ -20,7 +20,7 @@ char *timeago(unsigned long long time) {
         diff /= lengths[i];
     }
 
-    char *str = malloc(sizeof(char) * (strlen(periods[i]) + 1 + 1 + 1 + 4));
+    char *str = malloc(sizeof(char) * (strlen(periods[i]) + 7));
     sprintf(str, "%llu %s", diff, periods[i]);
     if(diff == 1) strcat(str, " ago");
     else strcat(str, "s ago");
