@@ -1,3 +1,2 @@
-*.o
-val
-wallets.txt
+/target/
+Cargo.lock
